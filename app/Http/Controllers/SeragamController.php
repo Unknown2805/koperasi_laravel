@@ -12,94 +12,72 @@ class SeragamController extends Controller
 	{
     		// mengambil data dari table pegawai
 		$seragam= Seragam::paginate(10);
+        $data = (object)[
+            "sortBy" => "created_at",
+            "sortType" => "asc",
+            "search" => "",
+            "ukuran_seragam" => "All",
+            "jenis_seragam" => "All"
+        ];
  
     		// mengirim data seragam ke view index
-		return view('seragam.seragam',compact('seragam'));
+		return view('seragam.seragam',compact('seragam', 'data'));
  
 	}
-//search seragam
-	public function cariSeragam(Request $request)
-	{
-        if($request->search){
 
-            $seragam = Seragam::where('ukuran','like','%'.$request->search.'%')->orWhere('jenis','like','%'.$request->search.'%')->orWhere('harga','like','%'.$request->search.'%')->get();
-  
-		return view('seragam.seragam',compact('seragam'));
-        }else{
+    public function operation(Request $request){
+        $sortBy = $request->sortBy ? $request->sortBy : "asc";
+        $sortType = $request->sortType ? $request->sortType : "created_at";
+        $search = $request->search ? $request->search : "";
+        $ukuran_seragam = $request->ukuran_seragam ? $request->ukuran_seragam : "All";
+        $jenis_seragam = $request->jenis_seragam ? $request->jenis_seragam : "All";
 
-            $seragam = Seragam::all();
-            return view('seragam.seragam',compact('seragam'));
+        $data = (object)[
+            "sortBy" => $sortBy,
+            "sortType" => $sortType,
+            "search" => $search,
+            "ukuran_seragam" => $ukuran_seragam,
+            "jenis_seragam" => $jenis_seragam
+        ];
 
+        if($jenis_seragam === "All" && $ukuran_seragam === "All"){
+            $filter = Seragam::where('ukuran','like','%'.$search.'%')
+                    ->orWhere('jenis','like','%'.$search.'%')
+                    ->orWhere('harga','like','%'.$search.'%')
+                    ->orderBy($sortBy,$sortType)
+                    ->get();
+        }
+        else if($jenis_seragam === "All" || $ukuran_seragam !== "All"){
+            $filter = Seragam::where('ukuran',$ukuran_seragam)
+                    ->orderBy($sortBy,$sortType)
+                    ->get();
+        }
+        else if($jenis_seragam !== "All" || $ukuran_seragam === "All"){
+            $filter = Seragam::where('jenis',$jenis_seragam)
+                    ->orderBy($sortBy,$sortType)
+                    ->get();
+        }
+        else{
+            $filter = Seragam::where('jenis',$jenis_seragam)
+                    ->where('ukuran',$ukuran_seragam)
+                    ->orderBy($sortBy,$sortType)
+                    ->get();
         }
 
+        foreach($filter as $key => $fil){
+            if(!str_contains($fil->jenis, $search) && !str_contains($fil->ukuran, $search && !str_contains($fil->harga, $search))){
+                unset($filter[$key]);
+            }
+        }
 
-	}
+        $seragam = $filter->values();
 
-
-//tanggal sort
-    public function sortASCSerTgl(Request $request){
-        
-        $seragam = Seragam::orderBy('created_at','asc')->get();
-        return view('seragam.seragam',compact('seragam'));
-
-    }
-    public function sortDESCSerTgl(Request $request){
-
-         $seragam = Seragam::orderBy('created_at','desc')->get();
-        return view('seragam.seragam',compact('seragam'));
-
-    }
-
-//ukuran sort
-    public function sortASCSerUk(Request $request){
-                   
-        $seragam = Seragam::orderBy('ukuran','asc')->get();
-        return view('seragam.seragam',compact('seragam'));
-
-    }
-    public function sortDESCSerUk(Request $request){
-
-        $seragam = Seragam::orderBy('ukuran','desc')->get();
-        return view('seragam.seragam',compact('seragam'));
-
-    }
-
-//jenis sort
-    public function sortASCSerJen(Request $request){
-
-        $seragam = Seragam::orderBy($input,'asc')->get();
-        return view('seragam.seragam',compact('seragam'));
-            
-    }
-    public function sortDESCSerJen(Request $request){
-
-        $seragam = Seragam::orderBy('jenis','desc')->get();
-        return view('seragam.seragam',compact('seragam'));
-
-    }
+        // dd($data, $seragam);
     
-//harga sort
-    public function sortASCSerHar(Request $request){
-
-        $seragam = Seragam::orderBy('harga','asc')->get();
-        return view('seragam.seragam',compact('seragam'));
-
+        return view('seragam.seragam',compact('seragam', 'data'));
     }
-    public function sortDESCSerHar(Request $request){
 
-        $seragam = Seragam::orderBy('harga','desc')->get();
-        return view('seragam.seragam',compact('seragam'));
 
-    }
- 
-//filter seragam
-    public function filter(Request $request){
-      
-        if($request->tanggal == 'asc'){
-            $seragam = Seragam::orderBy('ukuran','asc')->get();
-            return view('seragam.filter',compact('seragam'));
-        }
-    }
 
 //filter ukuran
     public function filtUks(Request $request){

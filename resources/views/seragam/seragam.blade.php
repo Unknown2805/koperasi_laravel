@@ -37,6 +37,44 @@
         </div>
     </div>
 
+    <div class="modal fade" id="filterSer" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Tambah Seragam</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST">
+                    @csrf
+                    <input type="hidden" name="sortBy" value="{{ $data->sortBy }}">
+                    <input type="hidden" name="sortType" value="{{ $data->sortType }}">
+                    <input type="hidden" name="search" value="{{ $data->search }}">
+                    <div class="modal-body">
+                        <select class="form-select" name="ukuran_seragam">
+                            <option selected>All</option>
+                            <option>S</option>
+                            <option>M</option>
+                            <option>L</option>
+                            <option>XL</option>
+                        </select>
+
+                        <select class="form-select" name="jenis_seragam">
+                            <option selected>All</option>
+                            <option>Olahraga</option>
+                            <option>Batik</option>
+                            <option>Pramuka</option>
+                            <option>Muslim</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" formaction="{{ url("/") }}">Apply</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     @foreach ($seragam as $d)
         <div class="modal fade" id="delete{{ $d->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -71,43 +109,21 @@
                     Add +
                 </button>
             </div>
-            <div class="col-2 col-sm-1">
-                <div class="dropdown show">
-                    <a class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          Ukuran
-                        </a>
-                        <ul class="dropdown-menu">
-                          <li><a class="dropdown-item" href="{{url("filt-uk-s")}}" name="uk_s">S</a></li>
-                          <li><a class="dropdown-item" href="{{url("filt-uk-m")}}" name="uk_m">M</a></li>
-                          <li><a class="dropdown-item" href="{{url("filt-uk-l")}}" name="uk_l">L</a></li>
-                          <li><a class="dropdown-item" href="{{url("filt-uk-xl")}}" name="uk_xl">XL</a></li>
-
-                        </ul>
-                    </a>
-                </div>
-            </div>
-            <div class="col-2 col-sm-2">
-                <div class="dropdown show">
-                    <a class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          Jenis Seragam
-                        </a>
-                        <ul class="dropdown-menu">
-                          <li><a class="dropdown-item" href="{{url("filt-jen-ol")}}" name="jen_ol">Olahraga</a></li>
-                          <li><a class="dropdown-item" href="{{url("filt-jen-btk")}}" name="jen_btk">Batik</a></li>
-                          <li><a class="dropdown-item" href="{{url("filt-jen-prmk")}}" name="jen_prmk">Pramuka</a></li>
-                          <li><a class="dropdown-item" href="{{url("filt-jen-mslm")}}" name="jen_mslm">Muslim</a></li>
-
-                        </ul>
-                    </a>
-                </div>
+            <div class="col-2 col-md-1">
+                <button type="button" class="btn btn-warning mb-3" data-bs-toggle="modal" data-bs-target="#filterSer">
+                    Filter
+                </button>
             </div>
             <div class="col-8 col-md-8">
 
-                <form class="d-flex" role="search" action={{url('cari-ser')}}>
+                <form class="d-flex" role="search" method="POST">
+                    @csrf
+                    <input type="hidden" name="ukuran_seragam" value="{{ $data->ukuran_seragam }}">
+                    <input type="hidden" name="jenis_seragam" value="{{ $data->jenis_seragam }}">
+                    <input type="hidden" name="sortBy" value="{{ $data->sortBy }}">
+                    <input type="hidden" name="sortType" value="{{ $data->sortType }}">
                     <input class="form-control me-2" type="search" placeholder="Search" name="search" aria-label="Search">
-                    <button class="btn btn-outline-success me-3" type="submit">Search</button>
+                    <button formaction="{{ url("/") }}" class="btn btn-outline-success me-3" type="submit">Search</button>
                 </form>
             </div>
         
@@ -121,29 +137,93 @@
                     <th>
                         <span>
                             Tanggal
-                            <a class="text-dark" href="{{ url("/asc-ser-tgl")}}" name="tanggal"><i class="fa-solid fa-arrow-down"></i></a>
-                            <a class="text-dark" href="{{ url("/desc-ser-tgl")}}" name="tanggal"><i class="fa-solid fa-arrow-up"></i></a>
+                            <form method="POST">
+                                @csrf
+                                <input type="hidden" name="ukuran_seragam" value="{{ $data->ukuran_seragam }}">
+                                <input type="hidden" name="jenis_seragam" value="{{ $data->jenis_seragam }}">
+                                <input type="hidden" name="sortBy" value="created_at">
+                                <input type="hidden" name="sortType" value="asc">
+                                <input type="hidden" name="search" value="{{ $data->search }}">
+                                <button formaction="{{ url("/") }}" class="text-dark"><i class="fa-solid fa-arrow-down"></i></button>
+                            </form>
+                            <form method="POST">
+                                @csrf
+                                <input type="hidden" name="ukuran_seragam" value="{{ $data->ukuran_seragam }}">
+                                <input type="hidden" name="jenis_seragam" value="{{ $data->jenis_seragam }}">
+                                <input type="hidden" name="sortBy" value="created_at">
+                                <input type="hidden" name="sortType" value="desc">
+                                <input type="hidden" name="search" value="{{ $data->search }}">
+                                <button formaction="{{ url("/") }}" class="text-dark"><i class="fa-solid fa-arrow-up"></i></button>
+                            </form>
                         </span>
                     </th>
                     <th>
                         <span>
                             Ukuran
-                            <a class="text-dark" href="{{ url("/asc-ser-uk")}}" name="ukuran"><i class="fa-solid fa-arrow-down"></i></a>
-                            <a class="text-dark" href="{{ url("/desc-ser-uk")}}" name="ukuran"><i class="fa-solid fa-arrow-up"></i></a>
+                            <form method="POST">
+                                @csrf
+                                <input type="hidden" name="ukuran_seragam" value="{{ $data->ukuran_seragam }}">
+                                <input type="hidden" name="jenis_seragam" value="{{ $data->jenis_seragam }}">
+                                <input type="hidden" name="sortBy" value="ukuran">
+                                <input type="hidden" name="sortType" value="asc">
+                                <input type="hidden" name="search" value="{{ $data->search }}">
+                                <button formaction="{{ url("/") }}" class="text-dark"><i class="fa-solid fa-arrow-down"></i></button>
+                            </form>
+                            <form method="POST">
+                                @csrf
+                                <input type="hidden" name="ukuran_seragam" value="{{ $data->ukuran_seragam }}">
+                                <input type="hidden" name="jenis_seragam" value="{{ $data->jenis_seragam }}">
+                                <input type="hidden" name="sortBy" value="ukuran">
+                                <input type="hidden" name="sortType" value="desc">
+                                <input type="hidden" name="search" value="{{ $data->search }}">
+                                <button formaction="{{ url("/") }}" class="text-dark"><i class="fa-solid fa-arrow-up"></i></button>
+                            </form>
                         </span>
                     </th>
                     <th>
                         <span>
                             Jenis Seragam
-                            <a class="text-dark" href="{{ url("/asc-ser-jen")}}" name="jenis"><i class="fa-solid fa-arrow-down"></i></a>
-                            <a class="text-dark" href="{{ url("/desc-ser-jen")}}" name="jenis"><i class="fa-solid fa-arrow-up"></i></a>
+                            <form method="POST">
+                                @csrf
+                                <input type="hidden" name="ukuran_seragam" value="{{ $data->ukuran_seragam }}">
+                                <input type="hidden" name="jenis_seragam" value="{{ $data->jenis_seragam }}">
+                                <input type="hidden" name="sortBy" value="jenis">
+                                <input type="hidden" name="sortType" value="asc">
+                                <input type="hidden" name="search" value="{{ $data->search }}">
+                                <button formaction="{{ url("/") }}" class="text-dark"><i class="fa-solid fa-arrow-down"></i></button>
+                            </form>
+                            <form method="POST">
+                                @csrf
+                                <input type="hidden" name="ukuran_seragam" value="{{ $data->ukuran_seragam }}">
+                                <input type="hidden" name="jenis_seragam" value="{{ $data->jenis_seragam }}">
+                                <input type="hidden" name="sortBy" value="jenis">
+                                <input type="hidden" name="sortType" value="desc">
+                                <input type="hidden" name="search" value="{{ $data->search }}">
+                                <button formaction="{{ url("/") }}" class="text-dark"><i class="fa-solid fa-arrow-up"></i></button>
+                            </form>
                         </span>
                     </th>
                     <th>
                         <span>
                             Harga
-                            <a class="text-dark" href="{{ url("/asc-ser-har")}}" name="harga"><i class="fa-solid fa-arrow-down"></i></a>
-                            <a class="text-dark" href="{{ url("/desc-ser-har")}}" name="harga"><i class="fa-solid fa-arrow-up"></i></a>
+                            <form method="POST">
+                                @csrf
+                                <input type="hidden" name="ukuran_seragam" value="{{ $data->ukuran_seragam }}">
+                                <input type="hidden" name="jenis_seragam" value="{{ $data->jenis_seragam }}">
+                                <input type="hidden" name="sortBy" value="harga">
+                                <input type="hidden" name="sortType" value="asc">
+                                <input type="hidden" name="search" value="{{ $data->search }}">
+                                <button formaction="{{ url("/") }}" class="text-dark"><i class="fa-solid fa-arrow-down"></i></button>
+                            </form>
+                            <form method="POST">
+                                @csrf
+                                <input type="hidden" name="ukuran_seragam" value="{{ $data->ukuran_seragam }}">
+                                <input type="hidden" name="jenis_seragam" value="{{ $data->jenis_seragam }}">
+                                <input type="hidden" name="sortBy" value="harga">
+                                <input type="hidden" name="sortType" value="desc">
+                                <input type="hidden" name="search" value="{{ $data->search }}">
+                                <button formaction="{{ url("/") }}" class="text-dark"><i class="fa-solid fa-arrow-up"></i></button>
+                            </form>
                         </span>
                     </th>
                  
